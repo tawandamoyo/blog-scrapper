@@ -4,12 +4,12 @@ const fs = require('fs');
 let URL = "https://bigsr.africa/author/dr-alex-magaisa";
 (async () => {
     const browser = await puppeteer.launch({
-        headless: false
+        headless: true
     });
     const page = await browser.newPage();
     await page.goto(URL);
 
-    let pagesToScrape = 1;
+    let pagesToScrape = 44;
     let currentPage = 1;
     let postLinks = [];
 
@@ -29,9 +29,12 @@ let URL = "https://bigsr.africa/author/dr-alex-magaisa";
         }
         currentPage++;
     }
-    postLinks = [...new Set(postLinks)];
+    await page.close();
 
-   for (let link of postLinks) {
+    postLinks = [...new Set(postLinks)];
+    console.log(postLinks.length);
+
+    for (let link of postLinks) {
         try {
             const page = await browser.newPage();
             await page.goto(link, {
@@ -55,20 +58,19 @@ let URL = "https://bigsr.africa/author/dr-alex-magaisa";
             });
 
             const path = `bsr/${postData.year}/${postData.month}`;
-            console.log(path);
 
             fs.mkdir(path, { recursive: true }, (error) => {
                 if (error) throw error;
-            })
+            });
 
-            // await page.pdf({
-            //     path: `bsr/${postData.year}/${postData.month}/${postData.title}.pdf`
-            // })
+            await page.pdf({
+                path: `bsr/${postData.year}/${postData.month}/${postData.title}.pdf`
+            });
+
+            await page.close();
 
         } catch (err) {
             console.error(err)
-        } finally {
-            // await page.close();
         }
-   }
+    }
 })();
