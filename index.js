@@ -27,7 +27,7 @@ let URL = "https://bigsr.africa/author/dr-alex-magaisa";
             await page.goto(`${URL}/page/${currentPage + 1}`);
             page.waitForNetworkIdle;
         }
-        currentPage++;
+        currentPage ++;
     }
     await page.close();
 
@@ -56,6 +56,14 @@ let URL = "https://bigsr.africa/author/dr-alex-magaisa";
                 }
 
             });
+
+            let post = await page.evaluate(() => {
+                let content = document.querySelector("article .td-post-content");
+                return content.innerHTML;
+            })
+            console.log(post);
+        
+            await page.setContent(post, {waitUntil: "domcontentloaded"});
 
             const path = `bsr/${postData.year}/${postData.month}`;
 
